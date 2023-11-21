@@ -4,7 +4,7 @@ class UserController {
   // [GET] /user
   async index(req, res) {
     try {
-      const users = await User.find({});
+      const users = await User.find({}).select("-password");
       res.status(200).json({ message: "success", user: users });
     } catch (error) {
       console.log(error);

@@ -61,10 +61,12 @@ class AuthController {
           },
         },
       ]);
+      const userData = result[0];
+      delete userData.password;
 
       res
         .status(200)
-        .json({ message: "Registration successful", data: result });
+        .json({ message: "Registration successful", data: userData });
     } catch (error) {
       console.error(error);
       res.status(500).json({ error: "Registration failed" });
