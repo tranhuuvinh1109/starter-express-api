@@ -18,6 +18,7 @@ class UserController {
       const {
         user_id,
         username,
+        fullname,
         email,
         password,
         avatar,
@@ -35,6 +36,7 @@ class UserController {
       }
 
       user.username = username || user.username;
+      user.fullname = fullname || user.fullname;
       user.email = email || user.email;
       user.password = password || user.password;
       user.avatar = avatar || user.avatar;

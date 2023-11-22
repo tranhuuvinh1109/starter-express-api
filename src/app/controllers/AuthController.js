@@ -1,4 +1,5 @@
 const User = require("../models/User");
+const Student = require("../models/Student");
 const Teacher = require("../models/Teacher");
 
 class AuthController {
@@ -28,45 +29,72 @@ class AuthController {
   // [POST] /auth/register
   async register(req, res) {
     try {
-      const { email } = req.body;
-      const existingUser = await User.findOne({ email });
+      const { email, type, phone } = req.body;
+      const existingUserByEmail = await User.findOne({ email });
+      const existingUserByPhone = await User.findOne({ phone });
 
-      if (existingUser) {
+      if (existingUserByEmail) {
         return res
           .status(400)
           .json({ error: "User with this email already exists" });
       }
 
+      if (existingUserByPhone) {
+        return res
+          .status(400)
+          .json({ error: "User with this phone number already exists" });
+      }
+
       const newUser = new User(req.body);
       await newUser.save();
-      const { teacher_name } = req.body;
-      const newTeacher = new Teacher({
-        user_id: newUser._id,
-        teacher_name: teacher_name,
-      });
+      if (type === 1) {
+        console.log("type", type);
+        const { teacher_name } = req.body;
+        const newTeacher = new Teacher({
+          user_id: newUser._id,
+          teacher_name: teacher_name,
+        });
 
-      await newTeacher.save();
-      const result = await User.aggregate([
-        {
-          $match: {
-            _id: newUser._id,
+        await newTeacher.save();
+        const result = await User.aggregate([
+          {
+            $match: {
+              _id: newUser._id,
+            },
           },
-        },
-        {
-          $lookup: {
-            from: "teachers",
-            localField: "_id",
-            foreignField: "user_id",
-            as: "teacher_info",
+          {
+            $lookup: {
+              from: "teachers",
+              localField: "_id",
+              foreignField: "user_id",
+              as: "teacher_info",
+            },
           },
-        },
-      ]);
-      const userData = result[0];
-      delete userData.password;
+        ]);
+        const userData = result[0];
+        delete userData.password;
 
-      res
-        .status(200)
-        .json({ message: "Registration successful", data: userData });
+        res
+          .status(200)
+          .json({ message: "Registration successful", data: userData });
+      } else {
+        console.log("type", type);
+        const { student_name, weight, height } = req.body;
+        const newStudent = new Student({
+          user_id: newUser._id,
+          student_name: student_name,
+          weight: weight,
+          height: height,
+        });
+
+        await newStudent.save();
+        const userData = { ...newUser._doc };
+        delete userData.password;
+
+        res
+          .status(200)
+          .json({ message: "Registration successful", data: userData });
+      }
     } catch (error) {
       console.error(error);
       res.status(500).json({ error: "Registration failed" });
