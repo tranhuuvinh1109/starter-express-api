@@ -28,6 +28,7 @@ class AuthController {
 
   // [POST] /auth/register
   async register(req, res) {
+    let newUser;
     try {
       const { email, type, phone } = req.body;
       const existingUserByEmail = await User.findOne({ email });
@@ -45,10 +46,10 @@ class AuthController {
           .json({ error: "User with this phone number already exists" });
       }
 
-      const newUser = new User(req.body);
+      newUser = new User(req.body);
       await newUser.save();
+
       if (type === 1) {
-        console.log("type", type);
         const { teacher_name } = req.body;
         const newTeacher = new Teacher({
           user_id: newUser._id,
@@ -78,7 +79,6 @@ class AuthController {
           .status(200)
           .json({ message: "Registration successful", data: userData });
       } else {
-        console.log("type", type);
         const { student_name, weight, height } = req.body;
         const newStudent = new Student({
           user_id: newUser._id,
@@ -97,6 +97,9 @@ class AuthController {
       }
     } catch (error) {
       console.error(error);
+      if (newUser) {
+        await User.findByIdAndDelete(newUser._id);
+      }
       res.status(500).json({ error: "Registration failed" });
     }
   }
