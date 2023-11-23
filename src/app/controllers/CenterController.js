@@ -1,4 +1,5 @@
 const Center = require("../models/Center");
+const Teacher = require("../models/Teacher");
 
 class CenterController {
   // [GET] /all
@@ -20,16 +21,23 @@ class CenterController {
     try {
       const centerId = req.params.id;
       const center = await Center.findById(centerId);
+      const teachers = await Teacher.find({
+        center_id: centerId,
+      });
+
+      const data = {
+        ...center._doc,
+        teachers: teachers,
+      };
 
       res
         .status(200)
-        .json({ message: "Get center detail successfully", data: center });
+        .json({ message: "Get center detail successfully", data: data });
     } catch (error) {
       console.error(error);
       res.status(500).json({ error: "Get center detail failed" });
     }
   }
-
   // [POST] /create
   async create(req, res) {
     try {
