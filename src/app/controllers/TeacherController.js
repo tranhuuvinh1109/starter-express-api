@@ -25,6 +25,7 @@ class TeacherController {
   //   }
   // }
   // [GET] /teacher/full
+  // [GET] /teacher/full
   async getFullData(req, res) {
     try {
       const teachers = await Teacher.find({})
@@ -34,6 +35,11 @@ class TeacherController {
       const data = teachers.map((teacher) => {
         const user = teacher.user_id;
         const center = teacher.center_id;
+
+        if (!user || !center) {
+          // Handle the case where either user or center is undefined
+          return null; // or provide default values or handle as needed
+        }
 
         return {
           age: teacher.age,
@@ -62,7 +68,7 @@ class TeacherController {
 
       res.status(200).json({ message: "success", data });
     } catch (error) {
-      console.log(error);
+      console.error(error);
       res.status(500).json({ error: "Error when querying Teacher table." });
     }
   }
