@@ -33,17 +33,15 @@ class CenterController {
       );
 
       const data = {
-        center: {
-          _id: center._id,
-          center_name: center.center_name,
-          manager: center.manager,
-          email: center.email,
-          address: center.address,
-          description: center.description,
-          image: center.image,
-          phone_number: center.phone_number,
-          teachers: teachers,
-        },
+        _id: center._id,
+        center_name: center.center_name,
+        manager: center.manager,
+        email: center.email,
+        address: center.address,
+        description: center.description,
+        image: center.image,
+        phone_number: center.phone_number,
+        teachers: teachers,
       };
 
       res
