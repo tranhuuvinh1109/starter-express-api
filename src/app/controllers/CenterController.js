@@ -42,8 +42,8 @@ class CenterController {
           description: center.description,
           image: center.image,
           phone_number: center.phone_number,
+          teachers: teachers,
         },
-        teachers: teachers,
       };
 
       res
