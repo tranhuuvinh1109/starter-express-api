@@ -11,7 +11,7 @@ const User = new Schema(
     gender: { type: Number, default: 1 },
     address: { type: String, default: "" },
     phone: { type: String, default: "" },
-    type: { type: Number, default: 0 },
+    type: { type: Number, required: false, default: 0 },
   },
   {
     timestamps: true,

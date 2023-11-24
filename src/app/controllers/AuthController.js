@@ -34,13 +34,6 @@ class AuthController {
       const { email, type, phone, center_id } = req.body;
 
       // Check if the center_id exists in the Center collection
-      const existingCenter = await Center.findById(center_id);
-      console.log("center --> ", existingCenter);
-      if (!existingCenter) {
-        return res
-          .status(400)
-          .json({ error: "Invalid center_id. Center not found." });
-      }
 
       const existingUserByEmail = await User.findOne({ email });
       const existingUserByPhone = await User.findOne({ phone });
@@ -61,6 +54,13 @@ class AuthController {
       await newUser.save();
 
       if (type === 1) {
+        const existingCenter = await Center.findById(center_id);
+        console.log("center --> ", existingCenter);
+        if (!existingCenter) {
+          return res
+            .status(400)
+            .json({ error: "Invalid center_id. Center not found." });
+        }
         const { teacher_name } = req.body;
         const newTeacher = new Teacher({
           user_id: newUser._id,
@@ -92,6 +92,34 @@ class AuthController {
           .json({ message: "Registration successful", data: userData });
       } else {
         // Handle student registration logic
+        const { student_name } = req.body;
+        const newStudent = new Student({
+          user_id: newUser._id,
+          student_name: student_name,
+        });
+
+        await newStudent.save();
+        const result = await User.aggregate([
+          {
+            $match: {
+              _id: newUser._id,
+            },
+          },
+          {
+            $lookup: {
+              from: "students",
+              localField: "_id",
+              foreignField: "user_id",
+              as: "student_info",
+            },
+          },
+        ]);
+        const userData = result[0];
+        delete userData.password;
+
+        res
+          .status(200)
+          .json({ message: "Registration successful", data: userData });
       }
     } catch (error) {
       console.error(error);

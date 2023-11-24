@@ -21,12 +21,28 @@ class CenterController {
     try {
       const centerId = req.params.id;
       const center = await Center.findById(centerId);
+
+      if (!center) {
+        return res.status(404).json({ error: "Center not found" });
+      }
+
       const teachers = await Teacher.find({
         center_id: centerId,
-      });
+      }).select(
+        "teacher_name image description certificate graduate experience"
+      );
 
       const data = {
-        ...center._doc,
+        center: {
+          _id: center._id,
+          center_name: center.center_name,
+          manager: center.manager,
+          email: center.email,
+          address: center.address,
+          description: center.description,
+          image: center.image,
+          phone_number: center.phone_number,
+        },
         teachers: teachers,
       };
 
@@ -38,6 +54,7 @@ class CenterController {
       res.status(500).json({ error: "Get center detail failed" });
     }
   }
+
   // [POST] /create
   async create(req, res) {
     try {
