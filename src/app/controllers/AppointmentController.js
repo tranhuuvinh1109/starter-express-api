@@ -1,6 +1,7 @@
 const Appointment = require("../models/Appointment");
 const Teacher = require("../models/Teacher");
 const Student = require("../models/Student");
+const Course = require("../models/Course");
 
 class AppointmentController {
   // [GET] /all
@@ -8,7 +9,8 @@ class AppointmentController {
     try {
       const appointments = await Appointment.find({})
         .populate("instructor")
-        .populate("student");
+        .populate("student")
+        .populate("course");
 
       res.status(200).json({
         message: "Get all appointments successfully",
@@ -42,17 +44,22 @@ class AppointmentController {
   async createAppointment(req, res) {
     try {
       const newAppointmentData = req.body;
+
+      // Check if the specified teacher, student, and course IDs exist
       const teacherExists = await Teacher.exists({
         _id: newAppointmentData.instructor,
       });
       const studentExists = await Student.exists({
         _id: newAppointmentData.student,
       });
+      const courseExists = await Course.exists({
+        _id: newAppointmentData.course,
+      });
 
-      if (!teacherExists || !studentExists) {
+      if (!teacherExists || !studentExists || !courseExists) {
         return res
           .status(400)
-          .json({ error: "Invalid teacher or student ID provided" });
+          .json({ error: "Invalid teacher, student, or course ID provided" });
       }
 
       const newAppointment = new Appointment(newAppointmentData);

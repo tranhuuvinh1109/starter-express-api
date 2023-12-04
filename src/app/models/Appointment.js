@@ -5,6 +5,7 @@ const Appointment = new Schema(
   {
     instructor: { type: Schema.Types.ObjectId, ref: "Teacher" },
     student: { type: Schema.Types.ObjectId, ref: "Student" },
+    course: { type: Schema.Types.ObjectId, ref: "Course" },
     date: { type: String, required: true },
     startTime: { type: String },
     endTime: { type: String },
