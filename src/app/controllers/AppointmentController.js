@@ -28,7 +28,8 @@ class AppointmentController {
       const appointmentId = req.params.id;
       const appointment = await Appointment.findById(appointmentId)
         .populate("instructor")
-        .populate("student");
+        .populate("student")
+        .populate("course");
 
       res.status(200).json({
         message: "Get appointment detail successfully",
@@ -37,6 +38,24 @@ class AppointmentController {
     } catch (error) {
       console.error(error);
       res.status(500).json({ error: "Get appointment detail failed" });
+    }
+  }
+  // [GET] /appointment-of-student/:id
+  async getAppointmentsOfStudent(req, res) {
+    try {
+      const studentId = req.params.id;
+      const appointments = await Appointment.find({ student: studentId })
+        .populate("instructor")
+        .populate("student")
+        .populate("course");
+
+      res.status(200).json({
+        message: "Get appointments of the student successfully",
+        data: appointments,
+      });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: "Get appointments of the student failed" });
     }
   }
 
