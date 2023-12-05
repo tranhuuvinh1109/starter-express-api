@@ -45,6 +45,24 @@ class CourseController {
       res.status(500).json({ error: "Get course detail failed" });
     }
   }
+  // [GET] /course-of-teacher/:id
+  async getCoursesOfTeacher(req, res) {
+    try {
+      const teacherId = req.params.id;
+
+      const courses = await Course.find({ teacher_id: teacherId }).populate(
+        "teacher_id"
+      );
+
+      res.status(200).json({
+        message: "Get courses of the teacher successfully",
+        data: courses,
+      });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: "Get courses of the teacher failed" });
+    }
+  }
 
   async update(req, res) {
     try {
