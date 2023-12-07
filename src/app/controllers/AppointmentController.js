@@ -1,20 +1,51 @@
+const mongoose = require("mongoose");
 const Appointment = require("../models/Appointment");
 const Teacher = require("../models/Teacher");
 const Student = require("../models/Student");
 const Course = require("../models/Course");
-
+const ObjectId = mongoose.Types.ObjectId;
 class AppointmentController {
   // [GET] /all
   async getAllAppointments(req, res) {
     try {
       const appointments = await Appointment.find({})
-        .populate("instructor")
-        .populate("student")
-        .populate("course");
-
+        .populate({
+          path: "course",
+          select:
+            "price number_of_students teacher_id course_name description image schedule createdAt updatedAt",
+          populate: {
+            path: "teacher_id",
+            select: "teacher_name",
+            populate: {
+              path: "center_id",
+              select: "address",
+            },
+          },
+        })
+        .populate("student", "student_name");
+      // Transform the appointments to the desired format
+      const transformedAppointments = appointments.map((appointment) => ({
+        _id: appointment._id,
+        instructor: appointment.instructor,
+        student: appointment.student._id,
+        student_name: appointment.student.student_name,
+        date: appointment.date,
+        startTime: appointment.startTime,
+        endTime: appointment.endTime,
+        status: appointment.status,
+        createdAt: appointment.createdAt,
+        updatedAt: appointment.updatedAt,
+        course_id: appointment.course._id,
+        course_name: appointment.course.course_name,
+        teacher_name: appointment.course.teacher_id.teacher_name,
+        teacher_id: appointment.course.teacher_id._id,
+        center_address: appointment.course.teacher_id.center_id.address,
+        schedule: appointment.course.schedule,
+        __v: appointment.__v,
+      }));
       res.status(200).json({
         message: "Get all appointments successfully",
-        data: appointments,
+        data: transformedAppointments,
       });
     } catch (error) {
       console.error(error);
@@ -27,13 +58,42 @@ class AppointmentController {
     try {
       const appointmentId = req.params.id;
       const appointment = await Appointment.findById(appointmentId)
-        .populate("instructor")
-        .populate("student")
-        .populate("course");
-
+        .populate({
+          path: "course",
+          select:
+            "price number_of_students teacher_id course_name description image schedule createdAt updatedAt",
+          populate: {
+            path: "teacher_id",
+            select: "teacher_name",
+            populate: {
+              path: "center_id",
+              select: "address",
+            },
+          },
+        })
+        .populate("student", "student_name");
+      const transformedAppointments = {
+        _id: appointment._id,
+        instructor: appointment.instructor,
+        student: appointment.student._id,
+        student_name: appointment.student.student_name,
+        date: appointment.date,
+        startTime: appointment.startTime,
+        endTime: appointment.endTime,
+        status: appointment.status,
+        createdAt: appointment.createdAt,
+        updatedAt: appointment.updatedAt,
+        course_id: appointment.course._id,
+        course_name: appointment.course.course_name,
+        teacher_name: appointment.course.teacher_id.teacher_name,
+        teacher_id: appointment.course.teacher_id._id,
+        center_address: appointment.course.teacher_id.center_id.address,
+        schedule: appointment.course.schedule,
+        __v: appointment.__v,
+      };
       res.status(200).json({
         message: "Get appointment detail successfully",
-        data: appointment,
+        data: transformedAppointments,
       });
     } catch (error) {
       console.error(error);
@@ -44,14 +104,47 @@ class AppointmentController {
   async getAppointmentsOfStudent(req, res) {
     try {
       const studentId = req.params.id;
+
       const appointments = await Appointment.find({ student: studentId })
-        .populate("instructor")
-        .populate("student")
-        .populate("course");
+        .populate({
+          path: "course",
+          select:
+            "price number_of_students teacher_id course_name description image schedule createdAt updatedAt",
+          populate: {
+            path: "teacher_id",
+            select: "teacher_name",
+            populate: {
+              path: "center_id",
+              select: "address",
+            },
+          },
+        })
+        .populate("student", "student_name");
+
+      // Transform the appointments to the desired format
+      const transformedAppointments = appointments.map((appointment) => ({
+        _id: appointment._id,
+        instructor: appointment.instructor,
+        student: appointment.student._id,
+        student_name: appointment.student.student_name,
+        date: appointment.date,
+        startTime: appointment.startTime,
+        endTime: appointment.endTime,
+        status: appointment.status,
+        createdAt: appointment.createdAt,
+        updatedAt: appointment.updatedAt,
+        course_id: appointment.course._id,
+        course_name: appointment.course.course_name,
+        teacher_name: appointment.course.teacher_id.teacher_name,
+        teacher_id: appointment.course.teacher_id._id,
+        center_address: appointment.course.teacher_id.center_id.address,
+        schedule: appointment.course.schedule,
+        __v: appointment.__v,
+      }));
 
       res.status(200).json({
         message: "Get appointments of the student successfully",
-        data: appointments,
+        data: transformedAppointments,
       });
     } catch (error) {
       console.error(error);
@@ -115,11 +208,23 @@ class AppointmentController {
     }
   }
 
-  // [DELETE] /:id
   async deleteAppointment(req, res) {
     try {
       const appointmentId = req.params.id;
-      await Appointment.findByIdAndDelete(appointmentId);
+      console.log("id: ", appointmentId);
+
+      // Convert the string ID to ObjectId explicitly
+      const validObjectId = ObjectId.isValid(appointmentId)
+        ? new ObjectId(appointmentId)
+        : null;
+
+      if (!validObjectId) {
+        return res
+          .status(400)
+          .json({ error: "Invalid appointment ID provided" });
+      }
+
+      await Appointment.findByIdAndDelete(validObjectId);
 
       res.status(200).json({ message: "Appointment deleted successfully" });
     } catch (error) {
