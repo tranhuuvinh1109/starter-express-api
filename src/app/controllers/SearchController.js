@@ -1,6 +1,7 @@
 const Center = require("../models/Center");
 const Teacher = require("../models/Teacher");
 const Course = require("../models/Course");
+const Appointment = require("../models/Appointment");
 
 class SearchController {
   // [GET] /search/all
@@ -43,8 +44,13 @@ class SearchController {
   async searchCenter(req, res) {
     try {
       const query = req.params.query;
+
+      // Search by center_name or address
       const centerPromise = Center.find({
-        center_name: { $regex: query, $options: "i" },
+        $or: [
+          { center_name: { $regex: query, $options: "i" } },
+          { address: { $regex: query, $options: "i" } },
+        ],
       });
 
       const [centers] = await Promise.all([centerPromise]);
@@ -81,6 +87,36 @@ class SearchController {
     } catch (error) {
       console.error(error);
       res.status(500).json({ error: "Search Teacher failed" });
+    }
+  }
+  // [GET] /search/appointment/start=:start&end=:end&date=:date
+  async searchAppointment(req, res) {
+    console.log("--------------");
+    try {
+      const start = req.params.start;
+      const end = req.params.end;
+      const date = req.params.date;
+
+      const appointmentPromise = Appointment.find({
+        date: { $eq: date },
+        startTime: { $gte: start },
+        endTime: { $lte: end },
+      })
+        .populate("instructor", "teacher_name") // Populate the instructor information
+        .populate("student", "student_name") // Populate the student information
+        .populate("course", "course_name"); // Populate the course information
+
+      const [appointments] = await Promise.all([appointmentPromise]);
+
+      res.status(200).json({
+        message: "Search Appointment successful",
+        data: {
+          appointments,
+        },
+      });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: "Search Appointment failed" });
     }
   }
 }

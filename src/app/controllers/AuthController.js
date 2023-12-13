@@ -55,7 +55,7 @@ class AuthController {
 
       if (type === 1) {
         const existingCenter = await Center.findById(center_id);
-        console.log("center --> ", existingCenter);
+
         if (!existingCenter) {
           return res
             .status(400)
@@ -69,27 +69,11 @@ class AuthController {
         });
 
         await newTeacher.save();
-        const result = await User.aggregate([
-          {
-            $match: {
-              _id: newUser._id,
-            },
-          },
-          {
-            $lookup: {
-              from: "teachers",
-              localField: "_id",
-              foreignField: "user_id",
-              as: "teacher_info",
-            },
-          },
-        ]);
-        const userData = result[0];
-        delete userData.password;
-
-        res
-          .status(200)
-          .json({ message: "Registration successful", data: userData });
+        delete newUser.password;
+        res.status(200).json({
+          message: "Registration successful",
+          data: { ...newUser._doc, weight: 0, height: 0 },
+        });
       } else {
         // Handle student registration logic
         const { student_name } = req.body;
@@ -99,27 +83,12 @@ class AuthController {
         });
 
         await newStudent.save();
-        const result = await User.aggregate([
-          {
-            $match: {
-              _id: newUser._id,
-            },
-          },
-          {
-            $lookup: {
-              from: "students",
-              localField: "_id",
-              foreignField: "user_id",
-              as: "student_info",
-            },
-          },
-        ]);
-        const userData = result[0];
-        delete userData.password;
 
-        res
-          .status(200)
-          .json({ message: "Registration successful", data: userData });
+        delete newUser.password;
+        res.status(200).json({
+          message: "Registration successful",
+          data: { ...newUser._doc, weight: 0, height: 0 },
+        });
       }
     } catch (error) {
       console.error(error);
