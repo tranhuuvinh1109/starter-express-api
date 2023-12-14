@@ -40,6 +40,28 @@ class SearchController {
     }
   }
 
+  // [GET] /search/course/q=
+  async searchCoursse(req, res) {
+    try {
+      const query = req.params.query;
+
+      const coursePromise = Course.find({
+        course_name: { $regex: query, $options: "i" },
+      });
+
+      const [courses] = await Promise.all([coursePromise]);
+
+      res.status(200).json({
+        message: "Search successful",
+        data: {
+          courses,
+        },
+      });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: "Search failed" });
+    }
+  }
   // [GET] /search/center
   async searchCenter(req, res) {
     try {
