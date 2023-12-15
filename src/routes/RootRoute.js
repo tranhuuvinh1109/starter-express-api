@@ -8,6 +8,10 @@ router.get("/search/center/q=:query", SearchController.searchCenter);
 router.get("/search/teacher/q=:query", SearchController.searchTeacher);
 router.get("/search/course/q=:query", SearchController.searchCoursse);
 router.get(
+  "/search/course/by-teacher/q=:teacherId",
+  SearchController.searchCourseByTeacher
+);
+router.get(
   "/search/appointment/start=:start&end=:end&date=:date",
   SearchController.searchAppointment
 );

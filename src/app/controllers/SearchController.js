@@ -62,6 +62,36 @@ class SearchController {
       res.status(500).json({ error: "Search failed" });
     }
   }
+
+  // [GET] /search/course/by-teacher/q=:teacherId
+  async searchCourseByTeacher(req, res) {
+    try {
+      const teacherId = req.params.teacherId;
+
+      const coursePromise = Course.find({
+        teacher_id: teacherId,
+      });
+      // const coursePromise = await Course.find({
+      //   teacher_id: teacherId,
+      // }).populate(
+      //   "teacher_id",
+      //   "teacher_name image description certificate age graduate experience"
+      // );
+
+      const [courses] = await Promise.all([coursePromise]);
+
+      res.status(200).json({
+        message: "Search Course by Teacher successful",
+        data: {
+          courses,
+        },
+      });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: "Search Course by Teacher failed" });
+    }
+  }
+
   // [GET] /search/center
   async searchCenter(req, res) {
     try {
