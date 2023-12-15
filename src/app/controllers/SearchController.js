@@ -67,10 +67,15 @@ class SearchController {
   async searchCourseByTeacher(req, res) {
     try {
       const teacherId = req.params.teacherId;
+      console.log(teacherId);
+      const regex = new RegExp(teacherId, "i");
 
       const coursePromise = Course.find({
-        teacher_id: teacherId,
-      });
+        teacher_id: { $regex: regex },
+      }).populate(
+        "teacher_id",
+        "teacher_name image description certificate age graduate experience"
+      );
       // const coursePromise = await Course.find({
       //   teacher_id: teacherId,
       // }).populate(

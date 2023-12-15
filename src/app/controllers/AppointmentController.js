@@ -26,22 +26,14 @@ class AppointmentController {
       // Transform the appointments to the desired format
       const transformedAppointments = appointments.map((appointment) => ({
         _id: appointment._id,
-        instructor: appointment.instructor,
-        student: appointment.student._id,
-        student_name: appointment.student.student_name,
+        course_name: appointment.course.course_name,
+        teacher_name: appointment.course.teacher_id.teacher_name,
         date: appointment.date,
         startTime: appointment.startTime,
         endTime: appointment.endTime,
-        status: appointment.status,
-        createdAt: appointment.createdAt,
-        updatedAt: appointment.updatedAt,
-        course_id: appointment.course._id,
-        course_name: appointment.course.course_name,
-        teacher_name: appointment.course.teacher_id.teacher_name,
-        teacher_id: appointment.course.teacher_id._id,
+        student_name: appointment.student.student_name,
         center_address: appointment.course.teacher_id.center_id.address,
-        schedule: appointment.course.schedule,
-        __v: appointment.__v,
+        status: appointment.status,
       }));
       res.status(200).json({
         message: "Get all appointments successfully",
@@ -74,22 +66,14 @@ class AppointmentController {
         .populate("student", "student_name");
       const transformedAppointments = {
         _id: appointment._id,
-        instructor: appointment.instructor,
-        student: appointment.student._id,
-        student_name: appointment.student.student_name,
+        course_name: appointment.course.course_name,
+        teacher_name: appointment.course.teacher_id.teacher_name,
         date: appointment.date,
         startTime: appointment.startTime,
         endTime: appointment.endTime,
-        status: appointment.status,
-        createdAt: appointment.createdAt,
-        updatedAt: appointment.updatedAt,
-        course_id: appointment.course._id,
-        course_name: appointment.course.course_name,
-        teacher_name: appointment.course.teacher_id.teacher_name,
-        teacher_id: appointment.course.teacher_id._id,
+        student_name: appointment.student.student_name,
         center_address: appointment.course.teacher_id.center_id.address,
-        schedule: appointment.course.schedule,
-        __v: appointment.__v,
+        status: appointment.status,
       };
       res.status(200).json({
         message: "Get appointment detail successfully",
@@ -124,22 +108,14 @@ class AppointmentController {
       // Transform the appointments to the desired format
       const transformedAppointments = appointments.map((appointment) => ({
         _id: appointment._id,
-        instructor: appointment.instructor,
-        student: appointment.student._id,
-        student_name: appointment.student.student_name,
+        course_name: appointment.course.course_name,
+        teacher_name: appointment.course.teacher_id.teacher_name,
         date: appointment.date,
         startTime: appointment.startTime,
         endTime: appointment.endTime,
-        status: appointment.status,
-        createdAt: appointment.createdAt,
-        updatedAt: appointment.updatedAt,
-        course_id: appointment.course._id,
-        course_name: appointment.course.course_name,
-        teacher_name: appointment.course.teacher_id.teacher_name,
-        teacher_id: appointment.course.teacher_id._id,
+        student_name: appointment.student.student_name,
         center_address: appointment.course.teacher_id.center_id.address,
-        schedule: appointment.course.schedule,
-        __v: appointment.__v,
+        status: appointment.status,
       }));
 
       res.status(200).json({
